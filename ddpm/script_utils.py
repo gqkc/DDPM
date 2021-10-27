@@ -64,7 +64,7 @@ def diffusion_defaults():
         use_labels=False,
 
         base_channels=128,
-        channel_mults=(1, 2, 2, 2),
+        channel_mults=(1, 2, 2),
         num_res_blocks=2,
         time_emb_dim=128 * 4,
         norm="gn",
@@ -111,7 +111,7 @@ def get_diffusion_from_args(args):
         )
 
     diffusion = GaussianDiffusion(
-        model, (32, 32), 3, 10,
+        model, (28, 28), 1, 10,
         betas,
         ema_decay=args.ema_decay,
         ema_update_rate=args.ema_update_rate,

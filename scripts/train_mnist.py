@@ -133,7 +133,7 @@ def create_argparser():
         log_to_wandb=True,
         log_rate=1000,
         log_dir="ddpm_logs",
-        project_name=None,
+        project_name="ddpm",
         run_name=run_name,
         channels=1,
         device=device,
