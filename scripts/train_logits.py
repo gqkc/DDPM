@@ -102,7 +102,7 @@ def main():
 
                 x_to_reconstruct = x[:10]
                 # recontructions
-                T = torch.ones((x_to_reconstruct.size(0))).long() * diffusion.num_timesteps - 1
+                T = torch.ones((x_to_reconstruct.size(0)), device=device).long() * diffusion.num_timesteps - 1
                 x_T = diffusion.perturb_x(x_to_reconstruct, T, torch.randn_like(x_to_reconstruct))
                 reconstructions = diffusion.sample(x_T.size(0), device, x=x_T)
                 ce_loss = cross_entropy(reconstructions, x_to_reconstruct) / 10
