@@ -54,9 +54,13 @@ def get_transform_minmax(min, max):
 
     class RescaleChannels(object):
         def __call__(self, sample):
-            return (2 * sample - 1).detach()
+            return 2 * sample - 1
 
-    return torchvision.transforms.Compose([Minmax(), RescaleChannels()])
+    class PermuteDetach(object):
+        def __call__(self, sample):
+            return sample.detach().permute(2, 0, 1)
+
+    return torchvision.transforms.Compose([Minmax(), RescaleChannels(), PermuteDetach()])
 
 
 def str2bool(v):
@@ -88,7 +92,7 @@ def add_dict_to_argparser(parser, default_dict):
 
 def diffusion_defaults():
     defaults = dict(
-        num_timesteps=1000,
+        #num_timesteps=1000,
         schedule="linear",
         loss_type="l2",
         use_labels=False,

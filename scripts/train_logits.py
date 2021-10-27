@@ -1,19 +1,18 @@
 import argparse
 import datetime
+
 import torch
 import wandb
-
 from torch.utils.data import DataLoader
-from torchvision import datasets
+
 from ddpm import script_utils
 from ddpm.script_utils import TransformDataset
-from torchvision import transforms
 
 
 def main():
     args = create_argparser().parse_args()
     device = args.device
-    ce_loss = torch.nn.CrossEntropyLoss()
+    cross_entropy = torch.nn.CrossEntropyLoss()
 
     try:
         diffusion = script_utils.get_diffusion_from_args(args).to(device)
@@ -64,7 +63,7 @@ def main():
             diffusion.train()
 
             x, y = next(train_loader)
-            x = x.detach().to(device).permute(0, 3, 1, 2)
+            x = x.detach().to(device)
             y = y.to(device)
 
             if args.use_labels:
@@ -85,7 +84,7 @@ def main():
                 with torch.no_grad():
                     diffusion.eval()
                     for x, y in test_loader:
-                        x = x.detach().to(device).permute(0, 3, 1, 2)
+                        x = x.detach().to(device)
                         y = y.to(device)
 
                         if args.use_labels:
@@ -101,6 +100,14 @@ def main():
                 torch.save(diffusion.state_dict(), model_filename)
                 torch.save(optimizer.state_dict(), optim_filename)
 
+                x_to_reconstruct = x[:10]
+                # recontructions
+                T = torch.ones((x_to_reconstruct.size(0))).long() * diffusion.num_timesteps - 1
+                x_T = diffusion.perturb_x(x_to_reconstruct, T, torch.randn_like(x_to_reconstruct))
+                reconstructions = diffusion.sample(x_T.size(0), device, x=x_T)
+                ce_loss = cross_entropy(reconstructions, x_to_reconstruct) / 10
+                img_reconstructions = model.decode(reconstructions.argmax(1).to(device))
+
                 if args.use_labels:
                     samples = diffusion.sample(10, device, y=torch.arange(10, device=device))
                 else:
@@ -113,7 +120,10 @@ def main():
                 wandb.log({
                     "test_loss": test_loss,
                     "train_loss": acc_train_loss,
+                    "test_ce_loss": ce_loss,
                     "samples": [wandb.Image(sample) for sample in img_samples],
+                    "reconstructions": [wandb.Image(img) for img in img_reconstructions],
+
                 })
 
                 acc_train_loss = 0
@@ -133,7 +143,7 @@ def create_argparser():
         learning_rate=2e-4,
         batch_size=128,
         iterations=2000,
-
+        num_timesteps=1000,
         log_to_wandb=True,
         log_rate=100,
         log_dir="ddpm_logs",
