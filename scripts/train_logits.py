@@ -105,7 +105,7 @@ def main():
                 else:
                     samples = diffusion.sample(10, device)
 
-                img_samples = model.decode(samples.argmax(1))
+                img_samples = model.decode(samples.argmax(1).to(device))
                 test_loss /= len(test_loader)
                 acc_train_loss /= args.log_rate
 
