@@ -1,6 +1,7 @@
 import argparse
 import torchvision
 import torch.nn.functional as F
+import torch
 
 from .unet import UNet
 from .diffusion import (
@@ -17,6 +18,23 @@ def cycle(dl):
     while True:
         for data in dl:
             yield data
+
+
+class TransformDataset(torch.utils.data.Dataset):
+    def __init__(self, dataset=None, transform=None):
+        self.dataset = dataset
+        self.transform = transform
+
+    def __getitem__(self, index):
+        data, target = self.dataset[index]
+
+        if self.transform is not None:
+            data = self.transform(data)
+        return data, target
+
+    def __len__(self):
+        return self.dataset.__len__()
+
 
 def get_transform():
     class RescaleChannels(object):
@@ -63,7 +81,7 @@ def diffusion_defaults():
         loss_type="l2",
         use_labels=False,
 
-        base_channels=128,
+        #base_channels=128,
         channel_mults=(1, 2, 2),
         num_res_blocks=2,
         time_emb_dim=128 * 4,
@@ -111,7 +129,7 @@ def get_diffusion_from_args(args):
         )
 
     diffusion = GaussianDiffusion(
-        model, (28, 28), 1, 10,
+        model, (args.img_size, args.img_size), args.channels, 10,
         betas,
         ema_decay=args.ema_decay,
         ema_update_rate=args.ema_update_rate,

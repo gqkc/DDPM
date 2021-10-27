@@ -137,6 +137,7 @@ def create_argparser():
         run_name=run_name,
         channels=1,
         device=device,
+        img_size=28,
     )
     defaults.update(script_utils.diffusion_defaults())
 
