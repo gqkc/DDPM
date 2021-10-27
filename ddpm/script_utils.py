@@ -87,7 +87,7 @@ def get_diffusion_from_args(args):
     }
 
     model = UNet(
-        img_channels=3,
+        img_channels=args.channels,
 
         base_channels=args.base_channels,
         channel_mults=args.channel_mults,

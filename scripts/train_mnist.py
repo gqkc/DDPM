@@ -135,7 +135,7 @@ def create_argparser():
         log_dir="ddpm_logs",
         project_name=None,
         run_name=run_name,
-
+        channels=1,
         device=device,
     )
     defaults.update(script_utils.diffusion_defaults())
