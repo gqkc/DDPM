@@ -52,7 +52,7 @@ def main():
             num_workers=0,
         ))
         test_loader = DataLoader(test_dataset, batch_size=batch_size, drop_last=True, num_workers=0)
-        
+
         acc_train_loss = 0
 
         for iteration in range(1, args.iterations + 1):
@@ -74,7 +74,7 @@ def main():
             optimizer.step()
 
             diffusion.update_ema()
-            
+
             if iteration % args.log_rate == 0:
                 test_loss = 0
                 with torch.no_grad():
@@ -95,12 +95,12 @@ def main():
 
                 torch.save(diffusion.state_dict(), model_filename)
                 torch.save(optimizer.state_dict(), optim_filename)
-                
+
                 if args.use_labels:
                     samples = diffusion.sample(10, device, y=torch.arange(10, device=device))
                 else:
                     samples = diffusion.sample(10, device)
-                
+
                 samples = ((samples + 1) / 2).clip(0, 1).permute(0, 2, 3, 1).numpy()
 
                 test_loss /= len(test_loader)
@@ -113,7 +113,7 @@ def main():
                 })
 
                 acc_train_loss = 0
-        
+
         if args.log_to_wandb:
             run.finish()
     except KeyboardInterrupt:
@@ -137,6 +137,8 @@ def create_argparser():
         run_name=run_name,
         channels=1,
         device=device,
+        base_channels=128,
+        img_size= 32
     )
     defaults.update(script_utils.diffusion_defaults())
 

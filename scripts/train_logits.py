@@ -13,6 +13,7 @@ from torchvision import transforms
 def main():
     args = create_argparser().parse_args()
     device = args.device
+    ce_loss = torch.nn.CrossEntropyLoss()
 
     try:
         diffusion = script_utils.get_diffusion_from_args(args).to(device)
@@ -41,8 +42,8 @@ def main():
         val_dataset = torch.load(args.val_dataset_path, map_location=device)
         if args.rescale == "normalize":
             full_train = next(iter(DataLoader(train_dataset, batch_size=len(train_dataset))))[0]
-            train_mean, train_std = full_train.mean(), full_train.std()
-            transform = transforms.Compose([transforms.Normalize(train_mean, train_std)])
+            train_min, train_max = full_train.min(), full_train.max()
+            transform = script_utils.get_transform_minmax(train_min, train_max)
             # load datasets
             train_dataset = TransformDataset(train_dataset, transform=transform)
             val_dataset = TransformDataset(val_dataset, transform=transform)

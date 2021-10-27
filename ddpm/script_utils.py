@@ -47,6 +47,18 @@ def get_transform():
     ])
 
 
+def get_transform_minmax(min, max):
+    class Minmax(object):
+        def __call__(self, sample):
+            return (sample - min) / (max - min)
+
+    class RescaleChannels(object):
+        def __call__(self, sample):
+            return (2 * sample - 1).detach()
+
+    return torchvision.transforms.Compose([Minmax(), RescaleChannels()])
+
+
 def str2bool(v):
     """
     https://stackoverflow.com/questions/15008758/parsing-boolean-values-with-argparse
@@ -81,7 +93,7 @@ def diffusion_defaults():
         loss_type="l2",
         use_labels=False,
 
-        #base_channels=128,
+        # base_channels=128,
         channel_mults=(1, 2, 2),
         num_res_blocks=2,
         time_emb_dim=128 * 4,
