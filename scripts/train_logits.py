@@ -132,11 +132,11 @@ def create_argparser():
     run_name = datetime.datetime.now().strftime("ddpm-%Y-%m-%d-%H-%M")
     defaults = dict(
         learning_rate=2e-4,
-        batch_size=16,
+        batch_size=128,
         iterations=1000,
 
         log_to_wandb=True,
-        log_rate=1000,
+        log_rate=100,
         log_dir="ddpm_logs",
         project_name="cifar",
         run_name=run_name,
