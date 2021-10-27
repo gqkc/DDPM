@@ -63,7 +63,7 @@ def main():
             diffusion.train()
 
             x, y = next(train_loader)
-            x = x.to(device).permute(0, 3, 1, 2)
+            x = x.detach().to(device).permute(0, 3, 1, 2)
             y = y.to(device)
 
             if args.use_labels:
@@ -84,8 +84,7 @@ def main():
                 with torch.no_grad():
                     diffusion.eval()
                     for x, y in test_loader:
-                        break
-                        x = x.to(device).permute(0, 3, 1, 2)
+                        x = x.detach().to(device).permute(0, 3, 1, 2)
                         y = y.to(device)
 
                         if args.use_labels:
@@ -106,7 +105,6 @@ def main():
                 else:
                     samples = diffusion.sample(10, device)
 
-                # samples = ((samples + 1) / 2).clip(0, 1).permute(0, 2, 3, 1).numpy()
                 img_samples = model.decode(samples.argmax(1))
                 test_loss /= len(test_loader)
                 acc_train_loss /= args.log_rate
