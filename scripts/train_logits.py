@@ -131,7 +131,7 @@ def create_argparser():
     defaults = dict(
         learning_rate=2e-4,
         batch_size=128,
-        iterations=1000,
+        iterations=2000,
 
         log_to_wandb=True,
         log_rate=100,
@@ -145,7 +145,7 @@ def create_argparser():
         train_dataset_path=None,
         val_dataset_path=None,
         img_size=8,
-        base_channels=32
+        base_channels=128
     )
     defaults.update(script_utils.diffusion_defaults())
 
