@@ -73,17 +73,20 @@ def main():
 
             acc_train_loss += loss.item()
 
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+            if not args.debug:
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-            diffusion.update_ema()
+                diffusion.update_ema()
 
             if iteration % args.log_rate == 0:
                 test_loss = 0
                 with torch.no_grad():
                     diffusion.eval()
                     for x, y in test_loader:
+                        if args.debug:
+                            break
                         x = x.detach().to(device)
                         y = y.to(device)
 
@@ -103,9 +106,12 @@ def main():
                 x_to_reconstruct = x[:10]
                 # recontructions
                 T = torch.ones((x_to_reconstruct.size(0)), device=device).long() * diffusion.num_timesteps - 1
-                x_T = diffusion.perturb_x(x_to_reconstruct, T, torch.randn_like(x_to_reconstruct)).to(device)
+                x_T = diffusion.perturb_x(x_to_reconstruct, T, torch.randn_like(x_to_reconstruct))
                 reconstructions = diffusion.sample(x_T.size(0), device, x=x_T)
+                assert reconstructions.device == device
+                assert x_to_reconstruct.device == device
                 ce_loss = cross_entropy(reconstructions, x_to_reconstruct)
+
                 img_reconstructions = model.decode(reconstructions.argmax(1).to(device))
 
                 if args.use_labels:
@@ -156,7 +162,8 @@ def create_argparser():
         train_dataset_path=None,
         val_dataset_path=None,
         img_size=8,
-        base_channels=128
+        base_channels=128,
+        debug=False
     )
     defaults.update(script_utils.diffusion_defaults())
 
