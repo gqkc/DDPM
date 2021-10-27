@@ -108,7 +108,8 @@ def main():
                 T = torch.ones((x_to_reconstruct.size(0)), device=device).long() * diffusion.num_timesteps - 1
                 x_T = diffusion.perturb_x(x_to_reconstruct, T, torch.randn_like(x_to_reconstruct))
                 reconstructions = diffusion.sample(x_T.size(0), device, x=x_T).to(device)
-                ce_loss = cross_entropy(reconstructions, x_to_reconstruct)
+                reconstructions_ce = reconstructions.permute(0, 2, 3, 1).contiguous().view(-1, reconstructions.size(1))
+                ce_loss = cross_entropy(reconstructions_ce, x_to_reconstruct.argmax(1).view(-1))
 
                 img_reconstructions = model.decode(reconstructions.argmax(1).to(device))
 
