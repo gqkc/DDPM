@@ -52,9 +52,9 @@ def main():
             batch_size=batch_size,
             shuffle=True,
             drop_last=True,
-            num_workers=0,
+            num_workers=4,
         ))
-        test_loader = DataLoader(val_dataset, batch_size=batch_size, drop_last=True, num_workers=0)
+        test_loader = DataLoader(val_dataset, batch_size=batch_size, drop_last=True, num_workers=4)
 
         acc_train_loss = 0
 
