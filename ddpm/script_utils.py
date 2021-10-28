@@ -47,6 +47,23 @@ def get_transform():
     ])
 
 
+def get_transform_exp():
+    class Minmax(object):
+        def __call__(self, sample):
+            return sample.exp()
+
+    class RescaleChannels(object):
+        def __call__(self, sample):
+            return 2 * sample - 1
+
+    class PermuteDetach(object):
+        def __call__(self, sample):
+            return sample.detach().permute(2, 0, 1)
+
+    return torchvision.transforms.Compose([Minmax(), RescaleChannels(), PermuteDetach()])
+
+
+
 def get_transform_minmax(min, max):
     class Minmax(object):
         def __call__(self, sample):
