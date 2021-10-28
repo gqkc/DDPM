@@ -62,6 +62,14 @@ class Exp(object):
         return sample.exp()
 
 
+def get_transform_exp_mean(mean):
+    class Mean(object):
+        def __call__(self, sample):
+            return (sample - mean)
+
+    return torchvision.transforms.Compose([Exp(), Mean(), PermuteDetach()])
+
+
 def get_transform_exp():
     return torchvision.transforms.Compose([Exp(), PermuteDetach()])
 
@@ -80,6 +88,14 @@ def get_transform_exp_minmax(min, max):
             return (sample - min) / (max - min)
 
     return torchvision.transforms.Compose([Exp(), Minmax(), PermuteDetach()])
+
+
+def get_transform_norm(mean, std):
+    class Norm(object):
+        def __call__(self, sample):
+            return (sample - mean) / std
+
+    return torchvision.transforms.Compose([Exp(), Norm(), PermuteDetach()])
 
 
 def get_transform_minmax(min, max):
