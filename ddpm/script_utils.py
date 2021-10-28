@@ -47,35 +47,36 @@ def get_transform():
     ])
 
 
+class RescaleChannels(object):
+    def __call__(self, sample):
+        return 2 * sample - 1
+
+
+class PermuteDetach(object):
+    def __call__(self, sample):
+        return sample.detach().permute(2, 0, 1)
+
+
 def get_transform_exp():
-    class Minmax(object):
+    class Exp(object):
         def __call__(self, sample):
             return sample.exp()
 
-    class RescaleChannels(object):
+    return torchvision.transforms.Compose([Exp(), RescaleChannels(), PermuteDetach()])
+
+
+def get_transform_soft(mean):
+    class Soft(object):
         def __call__(self, sample):
-            return 2 * sample - 1
+            return sample.softmax(-1) - mean
 
-    class PermuteDetach(object):
-        def __call__(self, sample):
-            return sample.detach().permute(2, 0, 1)
-
-    return torchvision.transforms.Compose([Minmax(), RescaleChannels(), PermuteDetach()])
-
+    return torchvision.transforms.Compose([Soft(), PermuteDetach()])
 
 
 def get_transform_minmax(min, max):
     class Minmax(object):
         def __call__(self, sample):
             return (sample - min) / (max - min)
-
-    class RescaleChannels(object):
-        def __call__(self, sample):
-            return 2 * sample - 1
-
-    class PermuteDetach(object):
-        def __call__(self, sample):
-            return sample.detach().permute(2, 0, 1)
 
     return torchvision.transforms.Compose([Minmax(), RescaleChannels(), PermuteDetach()])
 
@@ -109,13 +110,13 @@ def add_dict_to_argparser(parser, default_dict):
 
 def diffusion_defaults():
     defaults = dict(
-        #num_timesteps=1000,
+        # num_timesteps=1000,
         schedule="linear",
         loss_type="l2",
         use_labels=False,
 
         # base_channels=128,
-        #channel_mults=(1, 2, 2),
+        # channel_mults=(1, 2, 2),
         num_res_blocks=2,
         time_emb_dim=128 * 4,
         norm="gn",
