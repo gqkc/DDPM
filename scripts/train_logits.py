@@ -132,7 +132,8 @@ def main():
                     "samples": [wandb.Image(sample) for sample in img_samples],
                     "reconstructions": [wandb.Image(img) for img in img_reconstructions],
                     "originals": [wandb.Image(img) for img in img_originals],
-
+                    "samples_mean_value": samples.mean(),
+                    "reconstruction_mean_value": reconstructions.mean(),
                 })
 
                 acc_train_loss = 0
