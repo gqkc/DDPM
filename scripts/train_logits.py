@@ -112,7 +112,8 @@ def main():
                 ce_loss = cross_entropy(reconstructions_ce, x_to_reconstruct.argmax(1).view(-1))
 
                 img_reconstructions = model.decode(reconstructions.argmax(1).to(device))
-
+                max_values = (reconstructions > reconstructions.gather(1, x_to_reconstruct.argmax(1).unsqueeze(1)))
+                rank = max_values.sum(dim=1).float().mean()
                 if args.use_labels:
                     samples = diffusion.sample(10, device, y=torch.arange(10, device=device))
                 else:
@@ -126,9 +127,9 @@ def main():
                     "test_loss": test_loss,
                     "train_loss": acc_train_loss,
                     "test_ce_loss": ce_loss,
+                    "test_rank": rank,
                     "samples": [wandb.Image(sample) for sample in img_samples],
                     "reconstructions": [wandb.Image(img) for img in img_reconstructions],
-
                 })
 
                 acc_train_loss = 0
@@ -162,7 +163,8 @@ def create_argparser():
         val_dataset_path=None,
         img_size=8,
         base_channels=128,
-        debug=False
+        debug=False,
+        channel_mults=(1, 2, 2)
     )
     defaults.update(script_utils.diffusion_defaults())
 

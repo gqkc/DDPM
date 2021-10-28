@@ -135,10 +135,12 @@ def create_argparser():
         log_dir="ddpm_logs",
         project_name="cifar",
         run_name=run_name,
-        channels=1,
+        channels=3,
         device=device,
         base_channels=128,
-        img_size= 32
+        img_size=32,
+        num_timesteps=1000,
+        channel_mults=(1, 2, 2, 2),
     )
     defaults.update(script_utils.diffusion_defaults())
 

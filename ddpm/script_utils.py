@@ -98,7 +98,7 @@ def diffusion_defaults():
         use_labels=False,
 
         # base_channels=128,
-        channel_mults=(1, 2, 2),
+        #channel_mults=(1, 2, 2),
         num_res_blocks=2,
         time_emb_dim=128 * 4,
         norm="gn",
