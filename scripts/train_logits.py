@@ -172,7 +172,7 @@ def create_argparser():
         img_size=8,
         base_channels=128,
         debug=False,
-        channel_mults=(1, 2, 2)
+        channel_mults=(1, 2, 2, 2)
     )
     defaults.update(script_utils.diffusion_defaults())
 
