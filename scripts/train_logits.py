@@ -111,7 +111,8 @@ def main():
                 reconstructions_ce = reconstructions.permute(0, 2, 3, 1).contiguous().view(-1, reconstructions.size(1))
                 ce_loss = cross_entropy(reconstructions_ce, x_to_reconstruct.argmax(1).view(-1))
 
-                img_reconstructions = model.decode(reconstructions.argmax(1).to(device))
+                img_reconstructions = model.decode(x_to_reconstruct.argmax(1).to(device))
+                img_originals = model.decode(reconstructions.argmax(1).to(device))
                 max_values = (reconstructions > reconstructions.gather(1, x_to_reconstruct.argmax(1).unsqueeze(1)))
                 rank = max_values.sum(dim=1).float().mean()
                 if args.use_labels:
@@ -130,6 +131,8 @@ def main():
                     "test_rank": rank,
                     "samples": [wandb.Image(sample) for sample in img_samples],
                     "reconstructions": [wandb.Image(img) for img in img_reconstructions],
+                    "originals": [wandb.Image(img) for img in img_originals],
+
                 })
 
                 acc_train_loss = 0
