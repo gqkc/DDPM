@@ -62,7 +62,7 @@ def get_transform_exp():
         def __call__(self, sample):
             return sample.exp()
 
-    return torchvision.transforms.Compose([Exp(), RescaleChannels(), PermuteDetach()])
+    return torchvision.transforms.Compose([Exp(),  PermuteDetach()])
 
 
 def get_transform_soft(mean):
