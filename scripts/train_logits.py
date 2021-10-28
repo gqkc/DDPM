@@ -41,8 +41,8 @@ def main():
         val_dataset = torch.load(args.val_dataset_path, map_location=device)
         if args.rescale == "normalize":
             full_train = next(iter(DataLoader(train_dataset, batch_size=len(train_dataset))))[0]
-            # train_min, train_max = full_train.min(), full_train.max()
-            #train_mean = full_train.softmax(-1).mean(0).mean(-1).detach().unsqueeze(-1)
+            # train_min, train_max = full_train.mean(0).mean(-1).unsqueeze(-1), full_train.mean(0).mean(-1).unsqueeze(-1)
+            # train_mean = full_train.softmax(-1).mean(0).mean(-1).detach().unsqueeze(-1)
             transform = script_utils.get_transform_exp()
             # load datasets
             train_dataset = TransformDataset(train_dataset, transform=transform)

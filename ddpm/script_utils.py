@@ -57,12 +57,13 @@ class PermuteDetach(object):
         return sample.detach().permute(2, 0, 1)
 
 
-def get_transform_exp():
-    class Exp(object):
-        def __call__(self, sample):
-            return sample.exp()
+class Exp(object):
+    def __call__(self, sample):
+        return sample.exp()
 
-    return torchvision.transforms.Compose([Exp(),  PermuteDetach()])
+
+def get_transform_exp():
+    return torchvision.transforms.Compose([Exp(), PermuteDetach()])
 
 
 def get_transform_soft(mean):
@@ -71,6 +72,14 @@ def get_transform_soft(mean):
             return sample.softmax(-1) - mean
 
     return torchvision.transforms.Compose([Soft(), PermuteDetach()])
+
+
+def get_transform_exp_minmax(min, max):
+    class Minmax(object):
+        def __call__(self, sample):
+            return (sample - min) / (max - min)
+
+    return torchvision.transforms.Compose([Exp(), Minmax(), PermuteDetach()])
 
 
 def get_transform_minmax(min, max):
