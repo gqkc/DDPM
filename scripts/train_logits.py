@@ -161,7 +161,7 @@ def create_argparser():
         log_to_wandb=True,
         log_rate=100,
         log_dir="ddpm_logs",
-        project_name="cifar",
+        project_name="ddpm_mnist",
         run_name=run_name,
         channels=64,
         device=device,
